@@ -134,7 +134,13 @@ void loop() {
 
                 JsonObject & relayStatus_bedroom = relayStatus.createNestedObject("bedroom");
                 relayStatus_bedroom["status"] = bedLight;
-                relayStatus_bedroom["trigger"] = "<a href='/?turnOnLight'>on</a>";
+                if (bedLight == false){
+                    relayStatus_bedroom["trigger"] = "<a href='/?turnONLight'>on</a>";
+                }
+                else if (bedLight == true) {
+                    relayStatus_bedroom["trigger"] = "<a href='/?turnOFFLight'>on</a>";
+                    // de adaugat parametru sa porneasca releul
+                }
 
                 root.printTo(Serial);
                 Serial.println();
@@ -162,22 +168,14 @@ void loop() {
                     // client.println("<br />");
                     // control arduino pin via ethernet Start //
 
-                    if (readString.indexOf("?relay1on") > 0)//checks for on
+                    if (readString.indexOf("?turnONLight") > 0)//checks for on
                     {
-                        digitalWrite(RELAY_CH1, HIGH);    // set pin 4 high
-                        //Serial.println("Led On");
-                        client.println("works");
-                        //client.println("Light 1 Is On");
-                        client.println("not worked");
+                       bedLight = true;
                     }
                     else {
-                        if (readString.indexOf("?relay1off") > 0)//checks for off
+                        if (readString.indexOf("?turnOFFLight") > 0)//checks for off
                         {
-                            digitalWrite(RELAY_CH1, LOW);    // set pin 4 low
-                            //Serial.println("Led Off");
-                            client.println("<link rel='apple-touch-icon' href='http://chriscosma.co.cc/off.png' />");
-                            //client.println("Light 1 Is Off");
-                            client.println("<br />");
+                            bedLight = false;
                         }
                     }
                     break;

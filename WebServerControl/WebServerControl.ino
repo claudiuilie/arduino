@@ -152,7 +152,7 @@ void loop() {
 
                 root.printTo(Serial);
                 Serial.println();
-                    root.prettyPrintTo(client);
+                root.prettyPrintTo(client);
                     //             if (digitalRead(RELAY_CH8))
                     //             { 
                     //                client.print("<td><p style=\"font-family:arial;color:black;font-size:26px;\">Device 8.</p><p style=\"font-family:arial;color:green;font-size:35px;\">ON</p></td>");
@@ -166,14 +166,16 @@ void loop() {
                     // client.println("<br />");
                     // control arduino pin via ethernet Start //
                     
-                    if (readString.indexOf("?turnONLight") > 0)//checks for on
+                    if (readString.indexOf("?turnOnLight") > 0)//checks for on
                     {
                        bedLight = true;
+                       client.println(readString.indexOf("?turnOnLight"));
                     }
                     else {
-                        if (readString.indexOf("?turnOFFLight") > 0)//checks for off
+                        if (readString.indexOf("?turnOffLight") < 0)//checks for off
                         {
                             bedLight = false;
+                            client.println(readString.indexOf("?turnOffLight"));
                         }
                     }
                     break;

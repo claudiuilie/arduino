@@ -20,6 +20,8 @@ var relaysLegend = document.createElement("legend");
 relaysLegend.innerHTML = "Relays Status";
 relays.appendChild(relaysLegend);
 wrapper.appendChild(relays);
+// arduino
+
 
 var jsonData = {
     "tempSensors": [

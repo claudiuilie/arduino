@@ -25,4 +25,4 @@ int bathHum;
           { "status": true, "trigger": "<a href='/?relay1on'>on<a>" }
   }
 }
-
+}

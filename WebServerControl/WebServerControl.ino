@@ -57,9 +57,6 @@ void setup() {
 
 void loop() {
 
-    bedTemp = digitalRead(BED_TEMP_SENSOR);
-    Serial.print(bedTemp);
-
     //------Ethernet server setup---
   
     EthernetClient client = server.available();

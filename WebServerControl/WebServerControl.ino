@@ -81,6 +81,17 @@ void loop() {
                 // character) and the line is blank, the http request has ended,
                 // so you can send a reply
                 // https://arduinojson.org/v5/assistant/  --> json assistant
+                
+                if (c == '\n' && currentLineIsBlank) {
+
+                    // send a standard http response header
+                    client.println("HTTP/1.1 200 OK");
+                    client.println("Content-Type: application/json");
+                    client.println("Access-Control-Allow-Origin: *"); // allow cors
+                    client.println("Connection: close");  // the connection will be closed after completion of the response
+                    client.println("Refresh: 3");  // refresh the page automatically every 5 sec
+                    client.println();
+
                 StaticJsonBuffer < 1200 > jsonBuffer;
                 JsonObject & root = jsonBuffer.createObject();
                 JsonArray & tempSensors = root.createNestedArray("tempSensors");
@@ -141,16 +152,6 @@ void loop() {
 
                 root.printTo(Serial);
                 Serial.println();
-
-                if (c == '\n' && currentLineIsBlank) {
-
-                    // send a standard http response header
-                    client.println("HTTP/1.1 200 OK");
-                    client.println("Content-Type: application/json");
-                    client.println("Access-Control-Allow-Origin: *"); // allow cors
-                    client.println("Connection: close");  // the connection will be closed after completion of the response
-                    client.println("Refresh: 3");  // refresh the page automatically every 5 sec
-                    client.println();
                     root.prettyPrintTo(client);
                     //             if (digitalRead(RELAY_CH8))
                     //             { 
@@ -164,7 +165,7 @@ void loop() {
                     // client.println("<a href=\"/?relay8off\"\"><button style=\"width:360px;height:120px\"> <font size=\"7\">Device 8 OFF </font> </button> </a> <br />"); 
                     // client.println("<br />");
                     // control arduino pin via ethernet Start //
-
+                    
                     if (readString.indexOf("?turnONLight") > 0)//checks for on
                     {
                        bedLight = true;

@@ -21,14 +21,30 @@ relaysLegend.innerHTML = "Relays Status";
 relays.appendChild(relaysLegend);
 wrapper.appendChild(relays);
 
-var jsonData = {"tempSensors":[{"temp":20,"badge":"Bedroom Temp :","unit":"°C"},{"temp":20,"badge":"Livin Temp :","unit":"°C"},{"temp":20,"badge":"Kitchen Temp :","unit":"°C"},{"temp":20,"badge":"Bathroom Temp :","unit":"°C"}],"humiditySensors":[{"humidity":20,"badge":"Bedroom humidity :","unit":"%"},{"humidity":20,"badge":"Living humidity :","unit":"%"},{"humidity":20,"badge":"Kitchen humidity :","unit":"%"},{"humidity":20,"badge":"Bathroom humidity :","unit":"%"}],"relayStatus":{"bedroom":{"status":true,"trigger":"<a href='/?relay1on'>on<a>"}}};
+var jsonData = {
+    "tempSensors": [
+        { "temp": 20, "badge": "Bedroom Temp :", "unit": "°C" },
+        { "temp": 20, "badge": "Livin Temp :", "unit": "°C" },
+        { "temp": 20, "badge": "Kitchen Temp :", "unit": "°C" },
+        { "temp": 20, "badge": "Bathroom Temp :", "unit": "°C" }],
+    "humiditySensors": [
+        { "humidity": 20, "badge": "Bedroom humidity :", "unit": "%" },
+        { "humidity": 20, "badge": "Living humidity :", "unit": "%" },
+        { "humidity": 20, "badge": "Kitchen humidity :", "unit": "%" },
+        { "humidity": 20, "badge": "Bathroom humidity :", "unit": "%" }],
+    "relayStatus":
+    {
+        "bedroom":
+            { "status": true, "trigger": "<a href='/?relay1on'>on<a>" }
+    }
+}
 
-
-for (var i = 0; i< jsonData.tempSensors.length ; i ++){
+for (var i = 0; i < jsonData.tempSensors.length; i++) {
     console.log(jsonData.tempSensors[i].badge)
 
 
-sensors.insertAdjacentHTML('beforeend', `${jsonData.tempSensors[i].badge}<strong id="bedroomTempValue"><span class="badge bedroom">${jsonData.tempSensors[i].temp} ${jsonData.tempSensors[i].unit}</span></strong></br >`)
-  }
+    sensors.insertAdjacentHTML('beforeend', `${jsonData.tempSensors[i].badge}<strong id="bedroomTempValue"><span class="badge bedroom">${jsonData.tempSensors[i].temp} ${jsonData.tempSensors[i].unit}</span></strong></br >`)
+}
 
 return wrapper;
+

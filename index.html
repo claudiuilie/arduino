@@ -1,24 +1,25 @@
 <!-- {
     "tempSensors": {
-      "bedroomTemp": 20,
-      "livingroomTemp": 25,
-      "kitchenTemp": 30,
-      "bathroomTemp": 32,
-      "tempUnit": "°C"
+      "bedroom": { "temp": 20 , "badge": "Bedroom Temp :"},
+      "livingroomTemp":{ "temp": 20 , "badge": "Livin Temp :"},
+      "kitchenTemp": { "temp": 20 , "badge": "Kitchen Temp :"},
+      "bathroomTemp": { "temp": 20 , "badge": "Bathroom Temp :"},
+      "tempUnit": "°C",
+      "length": 4
     },
     "humiditySensors": {
-      "bedroomHumidity": 40,
-      "livingroomHumidity": 60,
-      "kitchenHumidity": 50,
-      "bathroomHumidity": 80,
-      "humidityUnit": "%"
+      "bedroomHumidity": { "humidity": 20 , "badge": "Bedroom humidity :"},
+      "livingroomHumidity": { "humidity": 20 , "badge": "Living humidity :"},
+      "kitchenHumidity": { "humidity": 20 , "badge": "Kitchen humidity :"},
+      "bathroomHumidity": { "humidity": 20 , "badge": "Bathroom humidity :"},
+      "humidityUnit": "%",
+      "length": 4
     },
     "relayStatus": {
         "bedroom": {
             "status": true,
             "trigger": "<a href='/?relay1on'>on<a>"
         }
-    }
   }
    -->
 
@@ -33,26 +34,24 @@
 </head>
 
 <body>
-  <fieldset class="" style="width:400px;">
+
+
+  <fieldset class="home-assistant-" style="width:400px;">
     <legend>Home Assistant</legend>
     <fieldset class="col-lg-2">
       <legend>Sensors</legend>
-      Bedroom Temp: <strong id="bedroomTempValue"><span class="badge">76</span></strong></br> 
-      Livingroom Temp: <strong id="livingroomTempValue"><span class="badge">76</span></strong> </br> 
-      Kitchen Temp: <strong id="kitchenTempValue"><span class="badge">76</span></strong> </br> 
-      Bathroom Temp: <strong id="bathroomTempValue"><span class="badge">76</span></strong> </br> 
+      Bedroom Temp: <strong id="bedroomTempValue"><span class="badge bedroom">76</span></strong></br> 
+      Livingroom Temp: <strong id="livingroomTempValue"><span class="badge livingroom">76</span></strong> </br> 
+      Kitchen Temp: <strong id="kitchenTempValue"><span class="badge kitchn">76</span></strong> </br> 
+      Bathroom Temp: <strong id="bathroomTempValue"><span class="badge bathroom">76</span></strong> </br> 
     </fieldset>
     <fieldset class="col-lg-2">
       <legend>Relays Status</legend>
-      Light Status: <strong id="created"><span class="badge">on</span></strong> </br> 
-      Humidity Status: <strong id="created"><span class="badge">off</span></strong> </br> 
+      Light Status: <strong id="created"><span class="badge lightstatus">on</span></strong> </br> 
+      Humidity Status: <strong id="created"><span class="badge himidity status">off</span></strong> </br> 
     </fieldset>
   </fieldset>
 
 
-
-
-
 </body>
-
 </html>

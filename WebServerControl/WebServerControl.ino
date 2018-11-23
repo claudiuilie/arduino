@@ -84,9 +84,11 @@ void loop(){
                    //GET /?Slidervalue0=1800&Submit=Sub+0 HTTP/1.1
                    if (readString.indexOf("turnOnLight") > 0) {
                        bedLight = true;
+                       Serial.println(readString.indexOf("turnOnLight"));
                    }
                    else if (readString.indexOf("turnOffLight") > 0) {
                        bedLight = false;
+                       Serial.println(readString.indexOf("turnOnLight"));
                    }
                     ///////////////////
 
@@ -99,6 +101,7 @@ void loop(){
                     client.println("Connection: close");  // the connection will be closed after completion of the response
                     // client.println("Refresh: 5");  // refresh the page automatically every 5 sec
                     // ---json generator----
+                    client.println();
                     StaticJsonBuffer < 1200 > jsonBuffer;
                     JsonObject & root = jsonBuffer.createObject();
                     JsonArray & tempSensors = root.createNestedArray("tempSensors");
@@ -149,11 +152,10 @@ void loop(){
 
                     JsonObject & relayStatus_bedroom = relayStatus.createNestedObject("bedroom");
                     relayStatus_bedroom["status"] = bedLight;
-
                     root.printTo(Serial);
                     Serial.println();
                     root.prettyPrintTo(client); // print to webpage
-
+                    client.println();
                     delay(1);
                     //stopping client
                     client.stop();
@@ -166,6 +168,3 @@ void loop(){
         }
     }
 }
-
-
-

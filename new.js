@@ -1,14 +1,11 @@
-#include <ArduinoJson.h>
-#include <SPI.h>
-#include <Dhcp.h>
-#include <Dns.h>
-#include <Ethernet.h>
-#include <EthernetClient.h>
-#include <EthernetServer.h>
-#include <EthernetUdp.h>
-
-
-
+#include < Dhcp.h >
+#include < Dns.h >
+#include < Ethernet.h >
+#include < EthernetClient.h >
+#include < EthernetServer.h >
+#include < EthernetUdp.h >
+#include < SPI.h >
+#include < ArduinoJson.h >
 
 
     //---------Ethernet Shield Settings--
@@ -60,7 +57,7 @@ void setup(){
 
 void loop(){
     // Create a client connection
-    EthernetClient client = server.available();
+    Client client = server.available();
     if (client) {
         while (client.connected()) {
             if (client.available()) {
@@ -70,7 +67,7 @@ void loop(){
                 if (readString.length() < 100) {
 
                     //store characters to string 
-                    readString += c;
+                    readString.append(c);
                 }
 
                 //if HTTP request has ended
@@ -80,14 +77,14 @@ void loop(){
                     Serial.println(readString);
                     //readString looks like "GET /?-0p1555-1p500t1000 HTTP/1.1"
 
-                    //////////////////////
-                   //GET /?Slidervalue0=1800&Submit=Sub+0 HTTP/1.1
-                   if (readString.indexOf("turnOnLight") > 0) {
-                       bedLight = true;
-                   }
-                   else if (readString.indexOf("turnOffLight") > 0) {
-                       bedLight = false;
-                   }
+                    ////////////////////////
+                    //GET /?Slidervalue0=1800&Submit=Sub+0 HTTP/1.1
+                    if (readString.contains("turnOnLight")) {
+                        bedLight = true;
+                    }
+                    else if (readString.contains("turnOffLight")) {
+                        bedLight = false;
+                    }
                     ///////////////////
 
                     //now output HTML data header
@@ -152,7 +149,7 @@ void loop(){
 
                     root.printTo(Serial);
                     Serial.println();
-                    root.prettyPrintTo(client); // print to webpage
+                    root.prettyPrintTo(client);
 
                     delay(1);
                     //stopping client

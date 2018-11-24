@@ -10,19 +10,34 @@ int bathHum;
 
 {
   "tempSensors": [
-      { "temp": bedTemp, "badge": "Bedroom Temp :", "unit": "°C" },
-      { "temp": livTemp, "badge": "Livin Temp :", "unit": "°C" },
-      { "temp": kitTemp, "badge": "Kitchen Temp :", "unit": "°C" },
-      { "temp": bathTemp, "badge": "Bathroom Temp :", "unit": "°C" }],
+      { "temp": bedTemp, "badge": "Bedroom "},
+      { "temp": livTemp, "badge": "Living "},
+      { "temp": kitTemp, "badge": "Kitchen "},
+      { "temp": bathTemp, "badge": "Bathroom "}],
   "humiditySensors": [
-      { "humidity": bedHum, "badge": "Bedroom humidity :", "unit": "%" },
-      { "humidity": livHum, "badge": "Living humidity :", "unit": "%" },
-      { "humidity": kitHum, "badge": "Kitchen humidity :", "unit": "%" },
-      { "humidity": bathHum, "badge": "Bathroom humidity :", "unit": "%" }],
+      { "humidity": bedHum, "badge": "Bedroom "},
+      { "humidity": livHum, "badge": "Living "},
+      { "humidity": kitHum, "badge": "Kitchen "},
+      { "humidity": bathHum, "badge": "Bathroom "}],
+   "icons":[{
+       "bed": "fa-bed",
+       "tv": "fa-television",
+       "cutlery": "fa-cutlery",
+       "bath": "fa-bath",
+       "humLow": "fa-thermometer-empty",
+       "humMedium": "fa-thermometer-half",
+       "humHigh": "fa-thermometer-full",
+       "danger": "fa-exclamation-triangle",
+       "humWarning":"fa-tint"
+   }],   
+   "unit":[{
+       "temperature":"°" ,
+       "humidity": "%"
+   }],
   "relayStatus":
   {
       "bedroom":
-          { "status": true, "trigger": "<a href='/?relay1on'>on<a>" }
+          { "status": false}
   }
 }
-}
+

@@ -21,7 +21,7 @@ IPAddress ip(192, 168, 1, 200);
 EthernetServer server(80);
 
 //---------Pins Variables--
-#define RELAY_CH1  2
+#define RELAY_CH1  3
 #define BED_TEMP_SENSOR 3
 
 //sensors
@@ -29,15 +29,15 @@ int pinDHT11 = 2; //<--bedroomHumidityAndTempSensor to digitalPin 2 (right side)
 
 //variables
 int bedTemp;
-int livTemp = 32;
-int kitTemp = 34;
-int bathTemp = 31;
+int livTemp = 1;
+int kitTemp = 1;
+int bathTemp = 1;
 int bedHum;
-int livHum = 20;
-int kitHum = 30;
-int bathHum = 40;
+int livHum = 1;
+int kitHum = 1;
+int bathHum = 1;
 
-bool bedLight = false;
+bool furnitureLight = false;
 
 String readString;
 
@@ -50,7 +50,7 @@ SimpleDHT11 dht11(pinDHT11);
 
 void setup(){
     // pinMode(BED_TEMP_SENSOR, INPUT);
-    // pinMode(RELAY_CH1, OUTPUT);
+     pinMode(RELAY_CH1, OUTPUT);
     // digitalWrite(RELAY_CH1, LOW);  // switch on LED1
 
     //----start the Ethernet connection and the server------
@@ -114,13 +114,14 @@ void loop(){
 
                     //////////////////////
                    //GET /?Slidervalue0=1800&Submit=Sub+0 HTTP/1.1
-                   if (readString.indexOf("turnOnLight") > 0) {
-                       bedLight = true;
-                       Serial.println(readString.indexOf("turnOnLight"));
+                   if (readString.indexOf("furnitureLedOn") > 0) {
+                       furnitureLight = true;
+                       digitalWrite(RELAY_CH1, HIGH);
+          
                    }
-                   else if (readString.indexOf("turnOffLight") > 0) {
-                       bedLight = false;
-                       Serial.println(readString.indexOf("turnOnLight"));
+                   else if (readString.indexOf("furnitureLedOff") > 0) {
+                       furnitureLight = false;
+                       digitalWrite(RELAY_CH1, LOW);
                    }
                     ///////////////////
 
@@ -134,74 +135,37 @@ void loop(){
                     // client.println("Refresh: 5");  // refresh the page automatically every 5 sec
                     // ---json generator----
                     client.println();
-                    StaticJsonBuffer < 1600 > jsonBuffer;
+                    StaticJsonBuffer < 1000 > jsonBuffer;
                     JsonObject& root = jsonBuffer.createObject();
 
-                    JsonArray& tempSensors = root.createNestedArray("tempSensors");
+                    JsonArray& thSensors = root.createNestedArray("thSensors");
                     
-                    JsonObject& tempSensors_0 = tempSensors.createNestedObject();
-                    tempSensors_0["temp"] = bedTemp;
-                    tempSensors_0["badge"] = "Bedroom ";
-                    tempSensors_0["unit"] = "°";
-                    tempSensors_0["icon"] = "fa-bed";
+                    JsonObject& thSensors_0 = thSensors.createNestedObject();
+                    thSensors_0["temp"] = bedTemp;
+                    thSensors_0["humidity"] = bedHum;
+                    thSensors_0["badge"] = "Bedroom ";
+                    thSensors_0["icon"] = "fas fa-bed";
                     
-                    JsonObject& tempSensors_1 = tempSensors.createNestedObject();
-                    tempSensors_1["temp"] = livTemp;
-                    tempSensors_1["badge"] = "Living ";
-                    tempSensors_1["unit"] = "°";
-                    tempSensors_1["icon"] = "fa-television";
+                    JsonObject& thSensors_1 = thSensors.createNestedObject();
+                    thSensors_1["temp"] = livTemp;
+                    thSensors_1["humidity"] = livHum;
+                    thSensors_1["badge"] = "Living ";
+                    thSensors_1["icon"] = "fas fa-couch";
                     
-                    JsonObject& tempSensors_2 = tempSensors.createNestedObject();
-                    tempSensors_2["temp"] = kitTemp;
-                    tempSensors_2["badge"] = "Kitchen ";
-                    tempSensors_2["unit"] = "°";
-                    tempSensors_2["icon"] = "fa-cutlery";
+                    JsonObject& thSensors_2 = thSensors.createNestedObject();
+                    thSensors_2["temp"] = kitTemp;
+                    thSensors_2["humidity"] = kitHum;
+                    thSensors_2["badge"] = "Kitchen ";
+                    thSensors_2["icon"] = "fas fa-utensils";
                     
-                    JsonObject& tempSensors_3 = tempSensors.createNestedObject();
-                    tempSensors_3["temp"] = bathTemp;
-                    tempSensors_3["badge"] = "Bathroom ";
-                    tempSensors_3["unit"] = "°";
-                    tempSensors_3["icon"] = "fa-bath";
-                    
-                    JsonArray& humiditySensors = root.createNestedArray("humiditySensors");
-                    
-                    JsonObject& humiditySensors_0 = humiditySensors.createNestedObject();
-                    humiditySensors_0["humidity"] = bedHum;
-                    humiditySensors_0["badge"] = "Bedroom ";
-                    humiditySensors_0["unit"] = "%";
-                    humiditySensors_0["icon"] = "fa-bed";
-                    
-                    JsonObject& humiditySensors_1 = humiditySensors.createNestedObject();
-                    humiditySensors_1["humidity"] = livHum;
-                    humiditySensors_1["badge"] = "Living ";
-                    humiditySensors_1["unit"] = "%";
-                    humiditySensors_1["icon"] = "fa-television";
-                    
-                    JsonObject& humiditySensors_2 = humiditySensors.createNestedObject();
-                    humiditySensors_2["humidity"] = kitHum;
-                    humiditySensors_2["badge"] = "Kitchen ";
-                    humiditySensors_2["unit"] = "%";
-                    humiditySensors_2["icon"] = "fa-cutlery";
-                    
-                    JsonObject& humiditySensors_3 = humiditySensors.createNestedObject();
-                    humiditySensors_3["humidity"] = bathHum;
-                    humiditySensors_3["badge"] = "Bathroom ";
-                    humiditySensors_3["unit"] = "%";
-                    humiditySensors_3["icon"] = "fa-bath";
-                    
-                    JsonArray& icons = root.createNestedArray("icons");
-                    
-                    JsonObject& icons_0 = icons.createNestedObject();
-                    icons_0["humLow"] = "fa-thermometer-empty";
-                    icons_0["humMedium"] = "fa-thermometer-half";
-                    icons_0["humHigh"] = "fa-thermometer-full";
-                    icons_0["danger"] = "fa-exclamation-triangle";
-                    icons_0["humWarning"] = "fa-tint";
-
-                    
+                    JsonObject& thSensors_3 = thSensors.createNestedObject();
+                    thSensors_3["temp"] = bathTemp;
+                    thSensors_3["humidity"] = bathHum;
+                    thSensors_3["badge"] = "Bathroom ";
+                    thSensors_3["icon"] = "fas fa-bath";
+                       
                     JsonObject& relayStatus = root.createNestedObject("relayStatus");
-                    JsonObject& relayStatus_bedroom = relayStatus.createNestedObject("bedroom");
-                    relayStatus_bedroom["status"] = false;
+                    relayStatus["furnitureLed"] = furnitureLight;
                     root.printTo(Serial);
                     Serial.println();
                     root.prettyPrintTo(client); // print to webpage

@@ -114,12 +114,12 @@ void loop(){
 
                     //////////////////////
                    //GET /?Slidervalue0=1800&Submit=Sub+0 HTTP/1.1
-                   if (readString.indexOf("furnitureLedOn") > 0) {
+                   if (readString.indexOf("FURNITURELED_ON") > 0) {
                        furnitureLight = true;
                        digitalWrite(RELAY_CH1, HIGH);
           
                    }
-                   else if (readString.indexOf("furnitureLedOff") > 0) {
+                   else if (readString.indexOf("FURNITURELED_OFF") > 0) {
                        furnitureLight = false;
                        digitalWrite(RELAY_CH1, LOW);
                    }

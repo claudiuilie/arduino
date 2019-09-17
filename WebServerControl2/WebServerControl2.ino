@@ -37,6 +37,7 @@ int livHum = 1;
 int kitHum = 1;
 int bathHum = 1;
 
+
 bool furnitureLight = false;
 
 String readString;
@@ -86,6 +87,7 @@ void loop(){
 
   bedTemp = (int)temperature;
   bedHum = (int)humidity;
+ 
   delay(2000);
   
     }
@@ -142,8 +144,8 @@ JsonArray sensors = doc.createNestedArray("sensors");
 
 JsonObject sensors_0 = sensors.createNestedObject();
 sensors_0["temp"] = bedTemp;
-sensors_0["tempProcent"] = (bedTemp/60)*100;
-sensors_0["humidity"] = 1;
+sensors_0["tempProcent"] = ((float)bedTemp/60)*100;
+sensors_0["humidity"] = bedHum ;
 sensors_0["icon"] = "fas fa-bed";
 JsonArray sensors_0_relays = sensors_0.createNestedArray("relays");
 
@@ -168,7 +170,7 @@ sensors_2["icon"] = "fas fa-utensils";
 JsonArray sensors_2_relays = sensors_2.createNestedArray("relays");
 
 JsonObject sensors_2_relays_0 = sensors_2_relays.createNestedObject();
-sensors_2_relays_0["status"] = false;
+sensors_2_relays_0["status"] = furnitureLight;
 sensors_2_relays_0["name"] = "kitchen lights";
 
 JsonObject sensors_3 = sensors.createNestedObject();
@@ -176,14 +178,9 @@ sensors_3["temp"] = 1;
 sensors_3["tempProcent"] = 1;
 sensors_3["humidity"] = 1;
 sensors_3["icon"] = "fas fa-bath";
-JsonArray sensors_3_relays = sensors_3.createNestedArray("relays");
 
-JsonArray relays = doc.createNestedArray("relays");
 
-JsonObject relays_0 = relays.createNestedObject();
-relays_0["name"] = "kitchen lights";
-relays_0["icon"] = "fas fa-utensils";
-relays_0["status"] = true;
+
 
 serializeJson(doc, client);
                     Serial.println();

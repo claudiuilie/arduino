@@ -39,8 +39,9 @@ String sensorsJson;
 int temperature;
 int humidity;
 
-const size_t capacity = JSON_ARRAY_SIZE(0) + 2*JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(3) + 2*JSON_OBJECT_SIZE(2) + 3*JSON_OBJECT_SIZE(4) + 190;
+const size_t capacity = 2*JSON_ARRAY_SIZE(0) + JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(3) + JSON_OBJECT_SIZE(3) + 3*JSON_OBJECT_SIZE(4) +170;
 DynamicJsonDocument doc(capacity);
+
 
 // Declare functions to be exposed to the API
 int ledControl(String command);
@@ -66,12 +67,7 @@ void setup(void)
   doc_1["temp"] = 10;
   doc_1["humidity"] = 1;
   doc_1["icon"] = "fas fa-couch";
-  
   JsonArray doc_1_relays = doc_1.createNestedArray("relays");
-  
-  JsonObject doc_1_relays_0 = doc_1_relays.createNestedObject();
-  doc_1_relays_0["status"] = false;
-  doc_1_relays_0["name"] = "living lights";
   
   JsonObject doc_2 = doc.createNestedObject();
   doc_2["temp"] = 1;
@@ -81,6 +77,7 @@ void setup(void)
   JsonArray doc_2_relays = doc_2.createNestedArray("relays");
   
   JsonObject doc_2_relays_0 = doc_2_relays.createNestedObject();
+  doc_2_relays_0["id"] = RELAY_CH1;
   doc_2_relays_0["status"] = false;
   doc_2_relays_0["name"] = "kitchen lights";
     
@@ -104,7 +101,6 @@ void setup(void)
   server.begin();
   Serial.print("server is at ");
   Serial.println(Ethernet.localIP());
-
   // Start watchdog
   wdt_enable(WDTO_4S);
 }

@@ -1,199 +1,151 @@
-#include <SimpleDHT.h>
-#include <ArduinoJson.h>
+
+
+/*
+  This a simple example of the aREST Library for Arduino (Uno/Mega/Due/Teensy)
+  using the Ethernet library (for example to be used with the Ethernet shield).
+  See the README file for more details.
+
+  Written in 2014 by Marco Schwartz under a GPL license.
+*/
+
+// Libraries
 #include <SPI.h>
-#include <Dhcp.h>
-#include <Dns.h>
 #include <Ethernet.h>
-#include <EthernetClient.h>
-#include <EthernetServer.h>
-#include <EthernetUdp.h>
+#include <aREST.h>
+#include <avr/wdt.h>
+#include <dht.h>
+#include <ArduinoJson.h>
 
-
-
-
-
-    //---------Ethernet Shield Settings--
-
+// Enter a MAC address for your controller below.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x2D };
 byte gateway[] = { 192, 168, 1, 254 }; //               <------- PUT YOUR ROUTERS IP Address to which your shield is connected Here
 byte subnet[] = { 255, 255, 255, 0 }; //                <------- It will be as it is in most of the cases
-IPAddress ip(192, 168, 1, 200);
+// IP address in case DHCP fails
+IPAddress ip(192,168,1,200);
+
+// Ethernet server
 EthernetServer server(80);
 
-//---------Pins Variables--
-#define RELAY_CH1  3
-#define BED_TEMP_SENSOR 3
+// Create aREST instance
+aREST rest = aREST();
 
-//sensors
-int pinDHT11 = 2; //<--bedroomHumidityAndTempSensor to digitalPin 2 (right side)
+// Variables to be exposed to the API
+#define RELAY_CH1 3 // releu bucatarie
+#define DHT22_PIN 2 //senzor temp/hum living
+#define DHT11_PIN 7 //senzor temp/hum arduino
 
-//variables
-int bedTemp;
-int livTemp = 1;
-int kitTemp = 1;
-int bathTemp = 1;
-int bedHum;
-int livHum = 1;
-int kitHum = 1;
-int bathHum = 1;
+dht DHT;
 
+// define variables
+String sensorsJson;
+int temperature;
+int humidity;
 
-bool furnitureLight = false;
-
-String readString;
-
-///////////////////////
-String teststring = String(100);
-String finalstring = String(100);
-String flag = String(2);
-
-SimpleDHT11 dht11(pinDHT11);
-
-void setup(){
-    // pinMode(BED_TEMP_SENSOR, INPUT);
-     pinMode(RELAY_CH1, OUTPUT);
-    // digitalWrite(RELAY_CH1, LOW);  // switch on LED1
-
-    //----start the Ethernet connection and the server------
-
-    Ethernet.begin(mac, ip);
-    server.begin();
-    Serial.print("server is at ");
-    Serial.println(Ethernet.localIP());
-
-    //enable serial data print 
-    Serial.begin(9600);
-
-}
-
-void loop(){
-
-  
-  
-////////Humidity And Temp Sensors//////
-
-  if (pinDHT11) {
-
-        byte temperature = 0;
-  byte humidity = 0;
-  byte data[40] = {0};
-  int err = SimpleDHTErrSuccess;
-  if ((err = dht11.read(&temperature, &humidity, data)) != SimpleDHTErrSuccess) {
-    bedTemp = 0;
-    bedHum = 0;
-    delay(1000);
-    return;
-  }
-
-  bedTemp = (int)temperature;
-  bedHum = (int)humidity;
- 
-  delay(2000);
-  
-    }
-    
-////////////////Server Setup //////
-
-    EthernetClient client = server.available();
-    if (client) {
-        while (client.connected()) {
-            if (client.available()) {
-                char c = client.read();
-
-                //read char by char HTTP request
-                if (readString.length() < 100) {
-
-                    //store characters to string 
-                    readString += c;
-                }
-
-                //if HTTP request has ended
-                if (c == '\n') {
-
-                    ///////////////
-                    Serial.println(readString);
-                    //readString looks like "GET /?-0p1555-1p500t1000 HTTP/1.1"
-
-                    //////////////////////
-                   //GET /?Slidervalue0=1800&Submit=Sub+0 HTTP/1.1
-                   if (readString.indexOf("FURNITURELED_ON") > 0) {
-                       furnitureLight = true;
-                       digitalWrite(RELAY_CH1, HIGH);
-          
-                   }
-                   else if (readString.indexOf("FURNITURELED_OFF") > 0) {
-                       furnitureLight = false;
-                       digitalWrite(RELAY_CH1, LOW);
-                   }
-                    ///////////////////
-
-                    //now output HTML data header
-
-                    // send a standard http response header
-                    client.println("HTTP/1.1 200 OK");
-                    client.println("Content-Type:  application/json");
-                    client.println("Access-Control-Allow-Origin: *"); // allow cors
-                    client.println("Connection: close");  // the connection will be closed after completion of the response
-                    // client.println("Refresh: 5");  // refresh the page automatically every 5 sec
-                    // ---json generator----
-                    client.println();
-const size_t capacity = 2*JSON_ARRAY_SIZE(0) + 3*JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(4) + 3*JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + 4*JSON_OBJECT_SIZE(5);
+const size_t capacity = JSON_ARRAY_SIZE(0) + 2*JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(3) + 2*JSON_OBJECT_SIZE(3) + 3*JSON_OBJECT_SIZE(4) + 220;
 DynamicJsonDocument doc(capacity);
 
-JsonArray sensors = doc.createNestedArray("sensors");
 
-JsonObject sensors_0 = sensors.createNestedObject();
-sensors_0["temp"] = bedTemp;
-sensors_0["tempProcent"] = ((float)bedTemp/60)*100;
-sensors_0["humidity"] = bedHum ;
-sensors_0["icon"] = "fas fa-bed";
-JsonArray sensors_0_relays = sensors_0.createNestedArray("relays");
-
-JsonObject sensors_1 = sensors.createNestedObject();
-sensors_1["temp"] = 1;
-sensors_1["tempProcent"] = 1;
-sensors_1["humidity"] = 1;
-sensors_1["icon"] = "fas fa-couch";
-
-JsonArray sensors_1_relays = sensors_1.createNestedArray("relays");
-
-JsonObject sensors_1_relays_0 = sensors_1_relays.createNestedObject();
-sensors_1_relays_0["status"] = false;
-sensors_1_relays_0["name"] = "living lights";
-
-JsonObject sensors_2 = sensors.createNestedObject();
-sensors_2["temp"] = 1;
-sensors_2["tempProcent"] = 1;
-sensors_2["humidity"] = 1;
-sensors_2["icon"] = "fas fa-utensils";
-
-JsonArray sensors_2_relays = sensors_2.createNestedArray("relays");
-
-JsonObject sensors_2_relays_0 = sensors_2_relays.createNestedObject();
-sensors_2_relays_0["status"] = furnitureLight;
-sensors_2_relays_0["name"] = "kitchen lights";
-
-JsonObject sensors_3 = sensors.createNestedObject();
-sensors_3["temp"] = 1;
-sensors_3["tempProcent"] = 1;
-sensors_3["humidity"] = 1;
-sensors_3["icon"] = "fas fa-bath";
+// Declare functions to be exposed to the API
+int webhookStatus(String command);
 
 
+void setup(void)
+{
+  // Start Serial
+  Serial.begin(115200);
+  
+  // pin modes (output or input)
+  pinMode(RELAY_CH1, OUTPUT);
+  // Init variables and expose them to REST API
+  
+  //Define sensors Object
+  JsonObject doc_0 = doc.createNestedObject();
+  doc_0["temp"] = 1;
+  doc_0["humidity"] = 1;
+  doc_0["icon"] = "fas fa-bed";
+  JsonArray doc_0_relays = doc_0.createNestedArray("relays");
+  
+  JsonObject doc_1 = doc.createNestedObject();
+  doc_1["temp"] = 1;
+  doc_1["humidity"] = 1;
+  doc_1["icon"] = "fas fa-couch";
+  JsonArray doc_1_relays = doc_1.createNestedArray("relays");
+  
+  JsonObject doc_1_relays_0 = doc_1_relays.createNestedObject();
+  doc_1_relays_0["status"] = false;
+  doc_1_relays_0["id"] = 99;
+  doc_1_relays_0["name"] = "Living lights";
+  doc_1_relays_0["webhook"] = "living_lights_";
+  
+  JsonObject doc_2 = doc.createNestedObject();
+  doc_2["temp"] = 1;
+  doc_2["humidity"] = 1;
+  doc_2["icon"] = "fas fa-utensils";
+  
+  JsonArray doc_2_relays = doc_2.createNestedArray("relays");
+  
+  JsonObject doc_2_relays_0 = doc_2_relays.createNestedObject();
+  doc_2_relays_0["id"] = RELAY_CH1;
+  doc_2_relays_0["status"] = false;
+  doc_2_relays_0["name"] = "kitchen lights";
+    
+  serializeJson(doc, sensorsJson);
+  rest.variable("sensors",&sensorsJson);
+  rest.variable("temperature",&temperature);
+  rest.variable("humidity",&humidity);
 
+  // Function to be exposed
+  rest.function("webhook",webhookStatus);
 
-serializeJson(doc, client);
-                    Serial.println();
-                    client.println();
-                    delay(1);
-                    //stopping client
-                    client.stop();
+  // Give name & ID to the device (ID should be 6 characters long)
+  rest.set_id("001");
+  rest.set_name("home_controller");
 
-                    /////////////////////
-                    //clearing string for next read
-                    readString = "";
-                }
-            }
-        }
+  // Start the Ethernet connection and the server
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    Ethernet.begin(mac, ip);
+  }
+  server.begin();
+  Serial.print("server is at ");
+  Serial.println(Ethernet.localIP());
+  // Start watchdog
+  wdt_enable(WDTO_4S);
+}
+
+void loop() {
+
+  EthernetClient client = server.available();
+  if (client) {
+      int chk = DHT.read22(DHT22_PIN);
+      deserializeJson(doc, sensorsJson);
+      sensorsJson = "";
+      // update json data when called
+      doc[1]["temp"] = (int)DHT.temperature;
+      doc[1]["humidity"] = (int)DHT.humidity;
+
+      chk = DHT.read11(DHT11_PIN);
+      doc[2]["temp"] = (int)DHT.temperature;
+      doc[2]["humidity"] = (int)DHT.humidity;
+            
+      doc[2]["relays"][0]["status"] = digitalRead(RELAY_CH1);   
+      serializeJson(doc, sensorsJson);
     }
+  rest.handle(client);
+  wdt_reset();
+}
+
+// Custom function accessible by the API
+int webhookStatus(String command) {
+
+  // Get state from command
+  int state = command.toInt();
+      
+  deserializeJson(doc, sensorsJson);
+  sensorsJson = "";
+  // update json data when called  
+  doc[1]["relays"][0]["status"] = state;      
+  serializeJson(doc, sensorsJson);
+ 
+  return 1;
 }

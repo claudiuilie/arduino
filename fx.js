@@ -93,7 +93,7 @@ class flowSelector {
             case debitCurrency == 'RON' || creditCurrency == 'RON':
                 this.flow = 'FX_RON'
                 break;
-            case debitCurrency != 'RON' || creditCurrency != 'RON':
+            case debitCurrency != 'RON' && creditCurrency != 'RON':
                 this.flow = 'FX_CROSS'
                 break;
         }

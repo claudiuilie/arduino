@@ -31,22 +31,26 @@ aREST rest = aREST();
 
 // Variables to be exposed to the API
 #define RELAY_CH1 3 // releu bucatarie
-#define DHT22_PIN 2 //senzor temp/hum living
-#define DHT11_PIN 7 //senzor temp/hum arduino
+#define DHT22_LIVING 2 //senzor temp/hum living
+#define DHT22_KITCHEN 7 //senzor temp/hum kitchen
+#define DHT22_BEDROOM 8 //senzor temp/hum bedroom
 
 dht DHT;
 
 // define variables
 String sensorsJson;
+String paramsJson;
 int temperature;
 int humidity;
 
 const size_t capacity = JSON_ARRAY_SIZE(0) + 2*JSON_ARRAY_SIZE(1) + JSON_ARRAY_SIZE(3) + 2*JSON_OBJECT_SIZE(3) + 3*JSON_OBJECT_SIZE(4) + 220;
 DynamicJsonDocument doc(capacity);
 
+const size_t capacity2 = JSON_ARRAY_SIZE(10) + 10*JSON_OBJECT_SIZE(1) + 160;
+DynamicJsonDocument docParams(capacity2);
 
 // Declare functions to be exposed to the API
-int webhookStatus(String command);
+int sonoffStatus(String command);
 
 
 void setup(void)
@@ -73,7 +77,7 @@ void setup(void)
   
   JsonObject doc_1_relays_0 = doc_1_relays.createNestedObject();
   doc_1_relays_0["status"] = false;
-  doc_1_relays_0["id"] = 99;
+  doc_1_relays_0["id"] = "100062aeb3";
   doc_1_relays_0["name"] = "Living lights";
   doc_1_relays_0["webhook"] = "living_lights_";
   
@@ -87,7 +91,7 @@ void setup(void)
   JsonObject doc_2_relays_0 = doc_2_relays.createNestedObject();
   doc_2_relays_0["id"] = RELAY_CH1;
   doc_2_relays_0["status"] = false;
-  doc_2_relays_0["name"] = "kitchen lights";
+  doc_2_relays_0["name"] = "Kitchen lights";
     
   serializeJson(doc, sensorsJson);
   rest.variable("sensors",&sensorsJson);
@@ -95,7 +99,7 @@ void setup(void)
   rest.variable("humidity",&humidity);
 
   // Function to be exposed
-  rest.function("webhook",webhookStatus);
+  rest.function("sonoff",sonoffStatus);
 
   // Give name & ID to the device (ID should be 6 characters long)
   rest.set_id("001");
@@ -117,14 +121,20 @@ void loop() {
 
   EthernetClient client = server.available();
   if (client) {
-      int chk = DHT.read22(DHT22_PIN);
+
       deserializeJson(doc, sensorsJson);
       sensorsJson = "";
       // update json data when called
+          
+      int chk = DHT.read22(DHT22_BEDROOM);
+      doc[0]["temp"] = (int)DHT.temperature;
+      doc[0]["humidity"] = (int)DHT.humidity;
+
+      chk = DHT.read22(DHT22_LIVING);
       doc[1]["temp"] = (int)DHT.temperature;
       doc[1]["humidity"] = (int)DHT.humidity;
 
-      chk = DHT.read11(DHT11_PIN);
+      chk = DHT.read22(DHT22_KITCHEN);  
       doc[2]["temp"] = (int)DHT.temperature;
       doc[2]["humidity"] = (int)DHT.humidity;
             
@@ -136,15 +146,22 @@ void loop() {
 }
 
 // Custom function accessible by the API
-int webhookStatus(String command) {
+int sonoffStatus(String command) {
 
   // Get state from command
-  int state = command.toInt();
-      
+  int comm = command.toInt();
+
   deserializeJson(doc, sensorsJson);
+    
   sensorsJson = "";
+//    for (int k =0; k < doc.size(); k++) {
+//      if(doc[k]["relays"][0]["id"] == "100062aeb3") {
+//         Serial.println("result:");
+//         Serial.println(k);
+//       }
+//    }
   // update json data when called  
-  doc[1]["relays"][0]["status"] = state;      
+  doc[1]["relays"][0]["status"] = comm;      
   serializeJson(doc, sensorsJson);
  
   return 1;

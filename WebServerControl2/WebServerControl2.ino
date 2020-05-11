@@ -30,10 +30,11 @@ EthernetServer server(80);
 aREST rest = aREST();
 
 // Variables to be exposed to the API
-#define RELAY_CH1 3 // releu bucatarie
+#define RELAY_CH1 3 // releu led bucatarie
+#define RELAY_CH2 4 // releu pompa Chucky bucatarie
 #define DHT22_LIVING 2 //senzor temp/hum living
-#define DHT22_KITCHEN 7 //senzor temp/hum kitchen
-#define DHT22_BEDROOM 8 //senzor temp/hum bedroom
+#define DHT22_KITCHEN 8   //senzor temp/hum kitchen
+//relays : NO (normally open) / NC (Normally close)
 
 dht DHT;
 
@@ -60,38 +61,40 @@ void setup(void)
   
   // pin modes (output or input)
   pinMode(RELAY_CH1, OUTPUT);
+  pinMode(RELAY_CH2, OUTPUT);
   // Init variables and expose them to REST API
-  
+  digitalWrite(RELAY_CH1,HIGH);
+  digitalWrite(RELAY_CH2,HIGH);
   //Define sensors Object
+  
   JsonObject doc_0 = doc.createNestedObject();
   doc_0["temp"] = 1;
   doc_0["humidity"] = 1;
-  doc_0["icon"] = "fas fa-bed";
+  doc_0["icon"] = "fas fa-couch";
   JsonArray doc_0_relays = doc_0.createNestedArray("relays");
+  
+  JsonObject doc_0_relays_0 = doc_0_relays.createNestedObject();
+  doc_0_relays_0["status"] = false;
+  doc_0_relays_0["id"] = "100062aeb3";
+  doc_0_relays_0["name"] = "Living lights";
+  doc_0_relays_0["webhook"] = "living_lights_";
   
   JsonObject doc_1 = doc.createNestedObject();
   doc_1["temp"] = 1;
   doc_1["humidity"] = 1;
-  doc_1["icon"] = "fas fa-couch";
+  doc_1["icon"] = "fas fa-utensils";
+  
   JsonArray doc_1_relays = doc_1.createNestedArray("relays");
   
   JsonObject doc_1_relays_0 = doc_1_relays.createNestedObject();
+  doc_1_relays_0["id"] = RELAY_CH1;
   doc_1_relays_0["status"] = false;
-  doc_1_relays_0["id"] = "100062aeb3";
-  doc_1_relays_0["name"] = "Living lights";
-  doc_1_relays_0["webhook"] = "living_lights_";
-  
-  JsonObject doc_2 = doc.createNestedObject();
-  doc_2["temp"] = 1;
-  doc_2["humidity"] = 1;
-  doc_2["icon"] = "fas fa-utensils";
-  
-  JsonArray doc_2_relays = doc_2.createNestedArray("relays");
-  
-  JsonObject doc_2_relays_0 = doc_2_relays.createNestedObject();
-  doc_2_relays_0["id"] = RELAY_CH1;
-  doc_2_relays_0["status"] = false;
-  doc_2_relays_0["name"] = "Kitchen lights";
+  doc_1_relays_0["name"] = "Kitchen lights";
+
+  JsonObject doc_1_relays_1 = doc_1_relays.createNestedObject();
+  doc_1_relays_1["id"] = RELAY_CH2;
+  doc_1_relays_1["status"] = false;
+  doc_1_relays_1["name"] = "Chucky's shower";
     
   serializeJson(doc, sensorsJson);
   rest.variable("sensors",&sensorsJson);
@@ -125,20 +128,16 @@ void loop() {
       deserializeJson(doc, sensorsJson);
       sensorsJson = "";
       // update json data when called
-          
-      int chk = DHT.read22(DHT22_BEDROOM);
+      int chk = DHT.read22(DHT22_LIVING);
       doc[0]["temp"] = (int)DHT.temperature;
       doc[0]["humidity"] = (int)DHT.humidity;
 
-      chk = DHT.read22(DHT22_LIVING);
+      chk = DHT.read22(DHT22_KITCHEN);  
       doc[1]["temp"] = (int)DHT.temperature;
       doc[1]["humidity"] = (int)DHT.humidity;
-
-      chk = DHT.read22(DHT22_KITCHEN);  
-      doc[2]["temp"] = (int)DHT.temperature;
-      doc[2]["humidity"] = (int)DHT.humidity;
             
-      doc[2]["relays"][0]["status"] = digitalRead(RELAY_CH1);   
+      doc[1]["relays"][0]["status"] = digitalRead(RELAY_CH1); 
+      doc[1]["relays"][1]["status"] = digitalRead(RELAY_CH2);     
       serializeJson(doc, sensorsJson);
     }
   rest.handle(client);

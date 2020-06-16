@@ -41,10 +41,10 @@ boolean automaticSwower;
 //variables distance sensor
 const int pingPin = 26; // Trigger Pin of Ultrasonic Sensor
 const int echoPin = 24; // Echo Pin of Ultrasonic Sensor
-const int rangeInCm = 10; // range senzor distanta
+const int rangeInCm = 25; // range senzor distanta cm
 const int distanceDelayInMils = 1000;  // delay senzor distanta
 const int timerInMinutes = 1; // interval pompa activa
-const int repeatTimer = 6;
+const int repeatTimer = 60; // 60 
 const int countdownRange = timerInMinutes * repeatTimer; // interval in s rulare pompa
 int countdown = 0;
 boolean isStarted = false;
